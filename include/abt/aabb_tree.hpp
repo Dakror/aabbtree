@@ -36,7 +36,6 @@
 #include <limits>
 
 #include <unordered_map>
-#include <span>
 #include <numeric>
 
 //#define vector moo
@@ -50,7 +49,14 @@ struct point {
   point(Values... values) : values{value_type(values)...}
   {
   }
-
+  
+  
+  template <typename Cont>
+  constexpr point(Cont const& c)
+  {
+      for(unsigned i = 0; i < Dim; ++i) values[i] = c[i];
+  }
+  
   point() = default;
 
   point(const point &other) : values(other.values){}
@@ -368,6 +374,8 @@ class tree {
   using vec = std::array<Ty, Dim>;
 
   enum class node_id : uint32_t {};
+  
+  float skin_width = 0.01f;
 
  private:
   static vec<ValTy> minimum_image_shift(const vec<ValTy> &bounds,
@@ -460,7 +468,7 @@ class tree {
   }
 
   /// Build an optimal tree.
-  tree(std::span<aabb> bbs)
+  tree(std::vector<aabb> bbs)
   {
     auto count = bbs.size();
 
@@ -548,7 +556,7 @@ class tree {
     // Allocate a new node for the entry.
     unsigned int node_idx = allocate_node();
     auto &node = m_nodes[node_idx];
-    node.bb = bb;
+    node.bb = fattened(bb, skin_width);
 
     // Zero the height.
     node.height = 0;
@@ -612,7 +620,7 @@ class tree {
     remove_leaf(node);
 
     // Assign the new AABB.
-    n.bb = bb;
+    n.bb = fattened(bb, skin_width);
 
     // Insert a new leaf node.
     insert_leaf(node);
@@ -896,7 +904,7 @@ class tree {
 
   /// The position of node at the top of the free list.
   unsigned int m_free_list;
-
+  
  private:
   template <class Fn>
   static decltype(auto) call_with_args(Fn &&fn, node_id id, const aabb &bb)
