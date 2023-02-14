@@ -429,6 +429,8 @@ class tree {
 
     /// Height of the node. This is 0 for a leaf and -1 for a free node.
     int height = 0;
+    
+    void* user_data = nullptr;
 
     //! Test whether the node is a leaf.
     /*! \return
@@ -551,12 +553,13 @@ class tree {
       \param upperBound
           The upper bound in each dimension.
    */
-  node_id insert(const aabb &bb)
+  node_id insert(const aabb &bb, void* user_data = nullptr)
   {
     // Allocate a new node for the entry.
     unsigned int node_idx = allocate_node();
     auto &node = m_nodes[node_idx];
     node.bb = fattened(bb, skin_width);
+    node.user_data = user_data;
 
     // Zero the height.
     node.height = 0;
@@ -564,6 +567,16 @@ class tree {
     // Insert a new leaf into the tree.
     insert_leaf(node_idx);
     return to_id(node_idx);
+  }
+  
+  void* data(node_id id) const {
+    auto node = to_unsigned(id);
+    auto &n = m_nodes[node];
+    
+    assert(node < m_node_capacity);
+    assert(n.isLeaf());
+    
+    return n.user_data;
   }
 
   /// Return the number of entrys in the tree.
