@@ -343,9 +343,8 @@ aabb<Dim, ValTy> fattened(aabb<Dim, ValTy> bb, double skin_thickness)
 {
   // Fatten the AABB.
   for (unsigned int i = 0; i < Dim; i++) {
-    auto sz = bb.upperBound[i] - bb.lowerBound[i];
-    bb.lowerBound[i] -= skin_thickness * sz;
-    bb.upperBound[i] += skin_thickness * sz;
+    bb.lowerBound[i] -= skin_thickness;
+    bb.upperBound[i] += skin_thickness;
   }
   bb.surfaceArea = bb.compute_surface_area();
   bb.centre = bb.compute_center();
