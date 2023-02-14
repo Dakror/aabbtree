@@ -586,8 +586,8 @@ class tree {
           The entry index (entryMap will be used to map the node).
    */
 
-  static unsigned to_unsigned(node_id id) { return static_cast<unsigned>(id); }
-  static node_id to_id(unsigned node) { return static_cast<node_id>(node); }
+  static constexpr unsigned to_unsigned(node_id id) { return static_cast<unsigned>(id); }
+  static constexpr node_id to_id(unsigned node) { return static_cast<node_id>(node); }
 
   void remove(node_id node_id)
   {
